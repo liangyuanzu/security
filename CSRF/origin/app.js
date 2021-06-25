@@ -81,6 +81,30 @@ router.post("/api/transferByCode", (ctx) => {
   }
 });
 
+router.post("/api/transferByReferer", (ctx) => {
+  const user = SESSION[ctx.cookies.get(SESSION_ID)];
+  if (user) {
+    const { payee, amount } = ctx.request.body;
+    const referer = ctx.request.headers["referer"] || ctx.request.headers["origin"] || "";
+    const verify = USERS.find((i) => i.username === payee);
+    if (verify) {
+      if (referer.includes("localhost:3000")) {
+        USERS.forEach((i) => {
+          if (i.username === user.username) i.account -= amount;
+          if (i.username === payee) i.account += amount;
+        });
+        ctx.body = RESPONSE("转账成功");
+      } else {
+        ctx.body = RESPONSE(-1, "'illegal source of request .'");
+      }
+    } else {
+      ctx.body = RESPONSE(-1, `${payee} does not exist`);
+    }
+  } else {
+    ctx.body = RESPONSE(-1, "user not logged in.");
+  }
+});
+
 app.use(router.routes()).use(router.allowedMethods());
 
 app.listen(3000);
