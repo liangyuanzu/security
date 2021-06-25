@@ -25,11 +25,31 @@ router.post("/api/login", (ctx) => {
 });
 
 router.get("/api/user", (ctx) => {
-  const user = SESSION[ctx.cookies.get(SESSION_ID)];
+  const user = Object.assign({}, SESSION[ctx.cookies.get(SESSION_ID)]);
   if (user) {
+    delete user.password;
     ctx.body = RESPONSE(0, user, "获取用户信息成功");
   } else {
-    ctx.body = RESPONSE(-1, "获取用户信息失败");
+    ctx.body = RESPONSE(-1, "user not logged in.");
+  }
+});
+
+router.post("/api/transfer", (ctx) => {
+  const user = SESSION[ctx.cookies.get(SESSION_ID)];
+  if (user) {
+    const { payee, amount } = ctx.request.body;
+    const verify = USERS.find((i) => i.username === payee);
+    if (verify) {
+      USERS.forEach((i) => {
+        if (i.username === user.username) i.account -= amount;
+        if (i.username === payee) i.account += amount;
+      });
+      ctx.body = RESPONSE("转账成功");
+    } else {
+      ctx.body = RESPONSE(-1, `${payee} does not exist`);
+    }
+  } else {
+    ctx.body = RESPONSE(-1, "user not logged in.");
   }
 });
 

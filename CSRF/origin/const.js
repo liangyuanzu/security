@@ -1,6 +1,6 @@
 module.exports.USERS = [
-  { username: "Jason_liang", password: "123456", account: 6000 },
-  { username: "liangyuanzu", password: "123456", account: 8000 },
+  { username: "zs", password: "123456", account: 6000 },
+  { username: "ls", password: "123456", account: 8000 },
 ];
 
 module.exports.SESSION_ID = "session";
