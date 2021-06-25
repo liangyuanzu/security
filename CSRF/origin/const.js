@@ -7,4 +7,24 @@ module.exports.SESSION_ID = "session";
 
 module.exports.SESSION = {};
 
-module.exports.RESPONSE = (code = 0, msg = "", data = {}) => ({ code, msg, data });
+module.exports.RESPONSE = (code, data, msg) => {
+  const res = {
+    code,
+    data,
+    msg,
+  };
+  if (code === undefined) {
+    res.code = 0;
+    return res;
+  } else if (data === undefined) {
+    res.code = 0;
+    res.data = {};
+    res.msg = code;
+    return res;
+  } else if (msg === undefined) {
+    res.data = {};
+    res.msg = data;
+    return res;
+  }
+  return res;
+};
