@@ -1,13 +1,13 @@
-module.exports.USERS = [
+const USERS = [
   { username: "zs", password: "123456", account: 6000 },
   { username: "ls", password: "123456", account: 8000 },
 ];
 
-module.exports.SESSION_ID = "session";
+const SESSION_ID = "session";
 
-module.exports.SESSION = {};
+const SESSION = {};
 
-module.exports.RESPONSE = (code, data, msg) => {
+const RESPONSE = (code, data, msg) => {
   const res = {
     code,
     data,
@@ -27,4 +27,14 @@ module.exports.RESPONSE = (code, data, msg) => {
     return res;
   }
   return res;
+};
+
+const secret = "csrf_token";
+
+module.exports = {
+  USERS,
+  SESSION_ID,
+  SESSION,
+  RESPONSE,
+  secret,
 };

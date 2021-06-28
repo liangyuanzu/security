@@ -3,12 +3,21 @@ const Router = require("@koa/router");
 const bodyParser = require("koa-bodyparser");
 const json = require("koa-json");
 const svgCaptcha = require("svg-captcha");
-const { USERS, SESSION_ID, SESSION, RESPONSE } = require("./const");
+const koaJwt = require("koa-jwt");
+const jwt = require("jsonwebtoken");
+const { USERS, SESSION_ID, SESSION, RESPONSE, secret } = require("./const");
 
 const app = new Koa();
 
 app.use(bodyParser());
 app.use(json());
+app.use(
+  koaJwt({
+    secret,
+  }).unless({
+    path: [/\/login/, /\/user/, /\/transfer/, /\/transferByCode/, /\/transferByReferer/],
+  })
+);
 
 const router = new Router();
 
@@ -18,8 +27,11 @@ router.post("/api/login", (ctx) => {
   if (user) {
     const cardId = Math.random() + Date.now();
     SESSION[cardId] = user;
-    ctx.cookies.set(SESSION_ID, cardId);
-    ctx.body = RESPONSE("登录成功");
+    ctx.cookies.set(SESSION_ID, cardId, {
+      httpOnly: true,
+    });
+    const token = jwt.sign(user, secret, { expiresIn: "1h" });
+    ctx.body = RESPONSE(0, { token }, "登录成功");
   } else {
     ctx.body = RESPONSE(-1, `${username} does not exist or password mismatch`);
   }
@@ -95,7 +107,36 @@ router.post("/api/transferByReferer", (ctx) => {
         });
         ctx.body = RESPONSE("转账成功");
       } else {
-        ctx.body = RESPONSE(-1, "'illegal source of request .'");
+        ctx.body = RESPONSE(-1, "illegal source of request .");
+      }
+    } else {
+      ctx.body = RESPONSE(-1, `${payee} does not exist`);
+    }
+  } else {
+    ctx.body = RESPONSE(-1, "user not logged in.");
+  }
+});
+
+router.post("/api/transferByToken", (ctx) => {
+  const user = SESSION[ctx.cookies.get(SESSION_ID)];
+  if (user) {
+    const { payee, amount } = ctx.request.body;
+    const verify = USERS.find((i) => i.username === payee);
+    if (verify) {
+      const [scheme, token] = ctx.request.headers["authorization"].split(" ");
+      if (/^Bearer$/i.test(scheme)) {
+        try {
+          jwt.verify(token, secret, {
+            complete: true,
+          });
+          USERS.forEach((i) => {
+            if (i.username === user.username) i.account -= amount;
+            if (i.username === payee) i.account += amount;
+          });
+          ctx.body = RESPONSE("转账成功");
+        } catch (error) {
+          ctx.body = RESPONSE(-1, "Authorization error.");
+        }
       }
     } else {
       ctx.body = RESPONSE(-1, `${payee} does not exist`);
