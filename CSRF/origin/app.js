@@ -5,6 +5,7 @@ const json = require("koa-json");
 const svgCaptcha = require("svg-captcha");
 const koaJwt = require("koa-jwt");
 const jwt = require("jsonwebtoken");
+const serve = require("koa-static");
 const { USERS, SESSION_ID, SESSION, RESPONSE, secret } = require("./const");
 
 const app = new Koa();
@@ -15,9 +16,10 @@ app.use(
   koaJwt({
     secret,
   }).unless({
-    path: [/\/login/, /\/user/, /\/transfer/, /\/transferByCode/, /\/transferByReferer/],
+    path: [/\//, /\/login/, /\/user/, /\/transfer/, /\/transferByCode/, /\/transferByReferer/],
   })
 );
+app.use(serve("public"));
 
 const router = new Router();
 
