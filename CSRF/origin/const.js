@@ -1,6 +1,6 @@
 const USERS = [
   { username: "zs", password: "123456", account: 6000 },
-  { username: "ls", password: "123456", account: 8000 },
+  { username: "ls", password: "123456", account: 6000 },
 ];
 
 const SESSION_ID = "session";

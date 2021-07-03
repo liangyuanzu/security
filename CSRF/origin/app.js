@@ -56,7 +56,8 @@ router.get("/api/user", (ctx) => {
 router.post("/api/transfer", (ctx) => {
   const user = SESSION[ctx.cookies.get(SESSION_ID)];
   if (user) {
-    const { payee, amount } = ctx.request.body;
+    let { payee, amount } = ctx.request.body;
+    amount = Number(amount);
     const verify = USERS.find((i) => i.username === payee);
     if (verify) {
       USERS.forEach((i) => {
@@ -75,7 +76,8 @@ router.post("/api/transfer", (ctx) => {
 router.post("/api/transferByCode", (ctx) => {
   const user = SESSION[ctx.cookies.get(SESSION_ID)];
   if (user) {
-    const { payee, amount, code } = ctx.request.body;
+    let { payee, amount, code } = ctx.request.body;
+    amount = Number(amount);
     const verify = USERS.find((i) => i.username === payee);
     if (verify) {
       if (code === user.code) {
@@ -98,7 +100,8 @@ router.post("/api/transferByCode", (ctx) => {
 router.post("/api/transferByReferer", (ctx) => {
   const user = SESSION[ctx.cookies.get(SESSION_ID)];
   if (user) {
-    const { payee, amount } = ctx.request.body;
+    let { payee, amount } = ctx.request.body;
+    amount = Number(amount);
     const referer = ctx.request.headers["referer"] || ctx.request.headers["origin"] || "";
     const verify = USERS.find((i) => i.username === payee);
     if (verify) {
@@ -122,7 +125,8 @@ router.post("/api/transferByReferer", (ctx) => {
 router.post("/api/transferByToken", (ctx) => {
   const user = SESSION[ctx.cookies.get(SESSION_ID)];
   if (user) {
-    const { payee, amount } = ctx.request.body;
+    let { payee, amount } = ctx.request.body;
+    amount = Number(amount);
     const verify = USERS.find((i) => i.username === payee);
     if (verify) {
       const [scheme, token] = ctx.request.headers["authorization"].split(" ");
