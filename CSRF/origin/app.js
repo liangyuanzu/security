@@ -42,7 +42,7 @@ router.post("/api/login", (ctx) => {
 router.get("/api/user", (ctx) => {
   const info = SESSION[ctx.cookies.get(SESSION_ID)];
   const user = Object.assign({}, info);
-  if (user) {
+  if (Object.keys(user).length) {
     delete user.password;
     const captcha = svgCaptcha.create();
     user.captcha = captcha;
