@@ -4,13 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>转账</title>
+    <title>通过 Token 防御 CSRF 攻击</title>
     <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet" />
   </head>
 
   <body>
     <h3 style="position: fixed; top: 40px; left: 50%; transform: translateX(-50%)">
-      具有 CSRF 漏洞的网站
+      通过 Token 防御 CSRF 攻击
     </h3>
     <div
       class="
@@ -118,8 +118,8 @@
     <ul style="text-align: center; padding-top: 100px">
       <li>
         钓鱼链接:
-        <a href="http://localhost:3001/fish/fish.html" target="_blank"
-          >http://localhost:3001/fish/fish.html</a
+        <a href="http://localhost:3001/fish/fishByToken.html" target="_blank"
+          >http://localhost:3001/fish/fishByToken.html</a
         >
       </li>
     </ul>
@@ -133,8 +133,16 @@
       transfer.onclick = () => {
         const payee = document.getElementById("payee").value;
         const amount = document.getElementById("amount").value;
+        const token = localStorage.getItem("token");
+
+        axios.interceptors.request.use((config) => {
+          const token = localStorage.getItem("token");
+          config.headers.Authorization = `Bearer ${token}`;
+          return config;
+        });
+
         axios
-          .post("/api/transfer", {
+          .post("/api/transferByToken", {
             payee,
             amount,
           })

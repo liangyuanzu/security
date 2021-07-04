@@ -45,7 +45,7 @@ router.get("/api/user", (ctx) => {
   if (Object.keys(user).length) {
     delete user.password;
     const captcha = svgCaptcha.create();
-    user.captcha = captcha;
+    user.code = captcha.data;
     info.code = captcha.text;
     ctx.body = RESPONSE(0, user, "获取用户信息成功");
   } else {

