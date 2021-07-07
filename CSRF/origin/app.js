@@ -30,7 +30,7 @@ router.post("/api/login", (ctx) => {
     const cardId = Math.random() + Date.now();
     SESSION[cardId] = user;
     ctx.cookies.set(SESSION_ID, cardId, {
-      httpOnly: true,
+      httpOnly: false,
     });
     const token = jwt.sign(user, secret, { expiresIn: "1h" });
     ctx.body = RESPONSE(0, { token }, "登录成功");
@@ -143,6 +143,31 @@ router.post("/api/transferByToken", (ctx) => {
         } catch (error) {
           ctx.body = RESPONSE(-1, "Authorization error.");
         }
+      }
+    } else {
+      ctx.body = RESPONSE(-1, `${payee} does not exist`);
+    }
+  } else {
+    ctx.body = RESPONSE(-1, "user not logged in.");
+  }
+});
+
+router.post("/api/transferBy2Cookie", (ctx) => {
+  const user = SESSION[ctx.cookies.get(SESSION_ID)];
+  if (user) {
+    let { payee, amount } = ctx.request.body;
+    amount = Number(amount);
+    const { cookie } = ctx.request.query;
+    const verify = USERS.find((i) => i.username === payee);
+    if (verify) {
+      if (cookie === ctx.cookies.get(SESSION_ID)) {
+        USERS.forEach((i) => {
+          if (i.username === user.username) i.account -= amount;
+          if (i.username === payee) i.account += amount;
+        });
+        ctx.body = RESPONSE("转账成功");
+      } else {
+        ctx.body = RESPONSE(-1, "illegal cookie of request .");
       }
     } else {
       ctx.body = RESPONSE(-1, `${payee} does not exist`);
